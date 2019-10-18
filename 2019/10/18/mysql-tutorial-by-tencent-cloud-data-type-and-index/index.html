@@ -104,18 +104,18 @@
 
 
 
-  <meta name="description" content="腾讯云搞数据库诊断大赛，提供了一份入门课程，这就拿来复习一下。 本文记录课程前两章（数据类型、索引）的知识点。 MySQL数据类型数据类型主要三大类：数据类型、日期/时间类、字符串类型 数值类型整数    整数类型 字节数     TINYINT 1   SMALLINT 2   MEDIUMINT 3   INT/INTEGER 4   BITINT 8     有关显示宽度显示宽度通过类型后的">
+  <meta name="description" content="腾讯云搞数据库诊断大赛，提供了一份入门课程，这就拿来复习一下。 本文记录课程前两章（数据类型、索引）的知识点。 MySQL数据类型数据类型主要三大类：数据类型、日期/时间类、字符串类型 数值类型整数    整数类型 字节数     TINYINT 1   SMALLINT 2   MEDIUMINT 3   INT/INTEGER 4   BITINT 8">
 <meta name="keywords" content="笔记,mysql">
 <meta property="og:type" content="article">
 <meta property="og:title" content="『笔记』MySQL数据类型、索引知识点汇总">
 <meta property="og:url" content="https://rainzhop.github.io/2019/10/18/mysql-tutorial-by-tencent-cloud-data-type-and-index/index.html">
 <meta property="og:site_name" content="积雨云">
-<meta property="og:description" content="腾讯云搞数据库诊断大赛，提供了一份入门课程，这就拿来复习一下。 本文记录课程前两章（数据类型、索引）的知识点。 MySQL数据类型数据类型主要三大类：数据类型、日期/时间类、字符串类型 数值类型整数    整数类型 字节数     TINYINT 1   SMALLINT 2   MEDIUMINT 3   INT/INTEGER 4   BITINT 8     有关显示宽度显示宽度通过类型后的">
+<meta property="og:description" content="腾讯云搞数据库诊断大赛，提供了一份入门课程，这就拿来复习一下。 本文记录课程前两章（数据类型、索引）的知识点。 MySQL数据类型数据类型主要三大类：数据类型、日期/时间类、字符串类型 数值类型整数    整数类型 字节数     TINYINT 1   SMALLINT 2   MEDIUMINT 3   INT/INTEGER 4   BITINT 8">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-10-18T04:56:56.055Z">
+<meta property="og:updated_time" content="2019-10-18T05:07:46.676Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="『笔记』MySQL数据类型、索引知识点汇总">
-<meta name="twitter:description" content="腾讯云搞数据库诊断大赛，提供了一份入门课程，这就拿来复习一下。 本文记录课程前两章（数据类型、索引）的知识点。 MySQL数据类型数据类型主要三大类：数据类型、日期/时间类、字符串类型 数值类型整数    整数类型 字节数     TINYINT 1   SMALLINT 2   MEDIUMINT 3   INT/INTEGER 4   BITINT 8     有关显示宽度显示宽度通过类型后的">
+<meta name="twitter:description" content="腾讯云搞数据库诊断大赛，提供了一份入门课程，这就拿来复习一下。 本文记录课程前两章（数据类型、索引）的知识点。 MySQL数据类型数据类型主要三大类：数据类型、日期/时间类、字符串类型 数值类型整数    整数类型 字节数     TINYINT 1   SMALLINT 2   MEDIUMINT 3   INT/INTEGER 4   BITINT 8">
 
 
 
@@ -331,9 +331,13 @@
                 
               
 
-              <time title="创建时间：2019-10-18 12:56:56" itemprop="dateCreated datePublished" datetime="2019-10-18T12:56:56+08:00">2019-10-18</time>
+              <time title="创建时间：2019-10-18 12:56:56 / 修改时间：13:07:46" itemprop="dateCreated datePublished" datetime="2019-10-18T12:56:56+08:00">2019-10-18</time>
             
 
+            
+              
+
+              
             
           </span>
 
@@ -400,6 +404,7 @@
 </tbody>
 </table>
 </div>
+<a id="more"></a>
 <h5 id="有关显示宽度"><a href="#有关显示宽度" class="headerlink" title="有关显示宽度"></a>有关显示宽度</h5><p>显示宽度通过类型后的小括号内的数字<code>M</code>设定。</p>
 <p>当插入数字宽度大于<code>M</code>时，显示时能够完全显示。</p>
 <p>当插入数字宽度小于<code>M</code>时，显示时显示宽度为 <code>M</code>。</p>
