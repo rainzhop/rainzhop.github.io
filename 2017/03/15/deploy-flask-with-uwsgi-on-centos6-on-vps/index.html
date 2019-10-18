@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css">
+
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前段时间和成儿聊起了微信公众号，突然又想试一试了。 之前是使用SAE作为第三方服务器连接过微信，但如今国内这些云应用平台都收费了[嘤嘤嘤]。那么，就好（cong）好（tou）复（xue）习（qi），搭一个Web服务器吧，顺便也能把租来科学上网的VPS再充分利用一下，所以这篇文章是记录一下在VPS上部署Flask的过程。 准备工作我VPS上装的CentOS6.6是最简系统，因此还需要安装不少东西。">
+<meta name="keywords" content="flask,web">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在CentOS6.6上使用uWSGI部署Flask应用">
+<meta property="og:url" content="https://rainzhop.github.io/2017/03/15/deploy-flask-with-uwsgi-on-centos6-on-vps/index.html">
+<meta property="og:site_name" content="积雨云">
+<meta property="og:description" content="前段时间和成儿聊起了微信公众号，突然又想试一试了。 之前是使用SAE作为第三方服务器连接过微信，但如今国内这些云应用平台都收费了[嘤嘤嘤]。那么，就好（cong）好（tou）复（xue）习（qi），搭一个Web服务器吧，顺便也能把租来科学上网的VPS再充分利用一下，所以这篇文章是记录一下在VPS上部署Flask的过程。 准备工作我VPS上装的CentOS6.6是最简系统，因此还需要安装不少东西。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-17T06:31:48.472Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在CentOS6.6上使用uWSGI部署Flask应用">
+<meta name="twitter:description" content="前段时间和成儿聊起了微信公众号，突然又想试一试了。 之前是使用SAE作为第三方服务器连接过微信，但如今国内这些云应用平台都收费了[嘤嘤嘤]。那么，就好（cong）好（tou）复（xue）习（qi），搭一个Web服务器吧，顺便也能把租来科学上网的VPS再充分利用一下，所以这篇文章是记录一下在VPS上部署Flask的过程。 准备工作我VPS上装的CentOS6.6是最简系统，因此还需要安装不少东西。">
+
+
+
+
+
+
+  <link rel="canonical" href="https://rainzhop.github.io/2017/03/15/deploy-flask-with-uwsgi-on-centos6-on-vps/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>在CentOS6.6上使用uWSGI部署Flask应用 | 积雨云</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">积雨云</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">微小透明，稍纵即逝<br>粗看无形，细听有声</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://rainzhop.github.io/2017/03/15/deploy-flask-with-uwsgi-on-centos6-on-vps/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王雨点">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/assets/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="积雨云">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在CentOS6.6上使用uWSGI部署Flask应用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-03-15 21:57:40" itemprop="dateCreated datePublished" datetime="2017-03-15T21:57:40+08:00">2017-03-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-17 14:31:48" itemprop="dateModified" datetime="2019-10-17T14:31:48+08:00">2019-10-17</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前段时间和成儿聊起了微信公众号，突然又想试一试了。</p>
+<p>之前是使用SAE作为第三方服务器连接过微信，但如今国内这些云应用平台都收费了[嘤嘤嘤]。那么，就好（cong）好（tou）复（xue）习（qi），搭一个Web服务器吧，顺便也能把租来科学上网的VPS再充分利用一下，所以这篇文章是记录一下在VPS上部署Flask的过程。</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>我VPS上装的CentOS6.6是最简系统，因此还需要安装不少东西。</p>
+<h3 id="安装python-devel"><a href="#安装python-devel" class="headerlink" title="安装python-devel"></a>安装python-devel</h3><p>因为安装其他python类库可能需要进行编译，所以需要安装python开发包。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yum -y <span class="keyword">install</span> python-devel</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h3 id="安装pip"><a href="#安装pip" class="headerlink" title="安装pip"></a>安装pip</h3><p>安装Python包管理工具pip。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yum -y <span class="keyword">install</span> python-pip</span><br></pre></td></tr></table></figure>
+<p>在调用yum命令时还出现了一个插曲，提示说<code>thread.error: can&#39;t start new thread</code>，这是由于系统内存太小，导致fastestmirror插件无法开启线程。解决方法是将该插件的默认线程数改小，只需要将<code>/etc/yum/pluginconf.d/fastestmirror.conf</code>中的<code>maxthreads</code>进行修改即可，我这里默认是15，改成5后再执行yum就不再报错了。我的VPS内存是64MB，仅供参考。</p>
+<h3 id="安装virtualenv"><a href="#安装virtualenv" class="headerlink" title="安装virtualenv"></a>安装virtualenv</h3><p>接着安装virtualenv，因为以后可能要部署不止一个python项目，使用virtualenv可以为不同项目提供相互隔离的包依赖环境。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yum -y <span class="keyword">install</span> virtualenv</span><br></pre></td></tr></table></figure>
+<h3 id="安装uWSGI"><a href="#安装uWSGI" class="headerlink" title="安装uWSGI"></a>安装uWSGI</h3><p>uWSGI是一个Web服务器，实现了WSGI协议，HTTP协议。一方面其使用HTTP协议接收和处理请求，一方面其通过WSGI与Web应用进行通信。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ pip <span class="keyword">install</span> uwsgi</span><br></pre></td></tr></table></figure>
+<h2 id="操练起来"><a href="#操练起来" class="headerlink" title="操练起来"></a>操练起来</h2><p>这样，所有需要安装的部件都已经准备完毕，下面通过一个实际的例子介绍Flask应用的部署过程。</p>
+<h3 id="准备好Web项目"><a href="#准备好Web项目" class="headerlink" title="准备好Web项目"></a>准备好Web项目</h3><p>我们建立一个最简的Flask应用。</p>
+<p>首先在项目目录下使用virtualenv创建一个Python虚拟环境。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> virtualenv venv</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> venv/bin/activate</span></span><br></pre></td></tr></table></figure>
+<p>此处由于要使用Flask，因此还要在虚拟环境中安装Flask。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(venv) $ pip <span class="keyword">install</span> flask</span><br></pre></td></tr></table></figure>
+<p>接着我们来准备一个简单但完整的Flask Web程序，将其命名为<code>hello.py</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'&lt;h1&gt;Hello World!&lt;/h1&gt;'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    app.run(debug=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="配置uWSGI"><a href="#配置uWSGI" class="headerlink" title="配置uWSGI"></a>配置uWSGI</h3><p>接下来需要建立uWSGI的配置文件。路径无所谓，这里将其命名为uwsgi.ini，内容如下。</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[uwsgi]</span></span><br><span class="line"><span class="attr">http</span> = <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">5000</span></span><br><span class="line"><span class="attr">chdir</span> = /path/to/webapp/</span><br><span class="line"><span class="attr">wsgi-file</span> = hello.py</span><br><span class="line"><span class="attr">callable</span> = app</span><br><span class="line"><span class="attr">processes</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">threads</span> = <span class="number">2</span></span><br><span class="line"><span class="attr">stats</span> = <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">9191</span></span><br></pre></td></tr></table></figure>
+<p>其中需要将<code>chdir</code>配置为上边Web项目的目录，<code>wsgi-file</code>配置为上边Flask Web程序的程序文件。</p>
+<h3 id="Give-it-a-go"><a href="#Give-it-a-go" class="headerlink" title="Give it a go."></a>Give it a go.</h3><p>此时，通过<code>uwsgi uwsgi.ini -H /path/to/venv</code>即可启动uWSGI。</p>
+<p>其中，<code>-H</code>选项用来设置环境变量<code>PYTHONHOME</code>。此处将其指定为Python虚拟环境，开启uWSGI时将会在该目录下搜索Python模块。</p>
+<p>OK，大功告成，现在可以通过浏览器访问<code>http://remotehost:5000</code>来打开上边准备的Web项目了。</p>
+<h3 id="让uWSGI自启动"><a href="#让uWSGI自启动" class="headerlink" title="让uWSGI自启动"></a>让uWSGI自启动</h3><p>修改<code>/etc/rc.local</code>文件，在其中加入如下一行</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uwsgi <span class="regexp">/path/</span>to<span class="regexp">/***/u</span>wsgi.ini -H <span class="regexp">/path/</span>to<span class="regexp">/webapp/</span>venv &amp;</span><br></pre></td></tr></table></figure>
+<p>这样以后每次服务器重启后，Web服务器就自动开启啦。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/flask/" rel="tag"># flask</a>
+          
+            <a href="/tags/web/" rel="tag"># web</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/19/an-introduction-to-tkinter-canvas-widget-class-reference-zh/" rel="next" title="『渣译』Tkinter简介 - Canvas组件">
+                <i class="fa fa-chevron-left"></i> 『渣译』Tkinter简介 - Canvas组件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/30/statistical-learning-notes/" rel="prev" title="『笔记』统计学习方法">
+                『笔记』统计学习方法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/avatar.jpg" alt="王雨点">
+            
+              <p class="site-author-name" itemprop="name">王雨点</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">12</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">17</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/rainzhop" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/cocozelle" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.douban.com/people/wangyudian" target="_blank" title="豆瓣"><i class="fa fa-fw fa-globe"></i>豆瓣</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/rainzhop" target="_blank" title="知乎"><i class="fa fa-fw fa-globe"></i>知乎</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#准备工作"><span class="nav-text">准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装python-devel"><span class="nav-text">安装python-devel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装pip"><span class="nav-text">安装pip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装virtualenv"><span class="nav-text">安装virtualenv</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装uWSGI"><span class="nav-text">安装uWSGI</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#操练起来"><span class="nav-text">操练起来</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#准备好Web项目"><span class="nav-text">准备好Web项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置uWSGI"><span class="nav-text">配置uWSGI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Give-it-a-go"><span class="nav-text">Give it a go.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#让uWSGI自启动"><span class="nav-text">让uWSGI自启动</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王雨点</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.3.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

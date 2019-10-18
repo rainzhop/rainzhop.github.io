@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css">
+
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="心血来潮，想学习下BitTorrent协议，做个学习笔记~ BitTorrent协议的维基百科释义：  BitTorrent协议（简称BT，俗称比特洪流、BT下载）是用在对等网络中文件分享的网络协议程序。和点对点（point-to-point）的协议程序不同，它是用户群对用户群（peer-to-peer），而且用户越多，下载同一文件的人越多，且下载后，继续维持上传的状态，就可以“分享”，成为其用户">
+<meta name="keywords" content="笔记,bt,协议">
+<meta property="og:type" content="article">
+<meta property="og:title" content="『笔记』BitTorrent协议学习">
+<meta property="og:url" content="https://rainzhop.github.io/2016/05/14/bittorrent-protocol-spec-learn-notes/index.html">
+<meta property="og:site_name" content="积雨云">
+<meta property="og:description" content="心血来潮，想学习下BitTorrent协议，做个学习笔记~ BitTorrent协议的维基百科释义：  BitTorrent协议（简称BT，俗称比特洪流、BT下载）是用在对等网络中文件分享的网络协议程序。和点对点（point-to-point）的协议程序不同，它是用户群对用户群（peer-to-peer），而且用户越多，下载同一文件的人越多，且下载后，继续维持上传的状态，就可以“分享”，成为其用户">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-17T06:31:44.414Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="『笔记』BitTorrent协议学习">
+<meta name="twitter:description" content="心血来潮，想学习下BitTorrent协议，做个学习笔记~ BitTorrent协议的维基百科释义：  BitTorrent协议（简称BT，俗称比特洪流、BT下载）是用在对等网络中文件分享的网络协议程序。和点对点（point-to-point）的协议程序不同，它是用户群对用户群（peer-to-peer），而且用户越多，下载同一文件的人越多，且下载后，继续维持上传的状态，就可以“分享”，成为其用户">
+
+
+
+
+
+
+  <link rel="canonical" href="https://rainzhop.github.io/2016/05/14/bittorrent-protocol-spec-learn-notes/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>『笔记』BitTorrent协议学习 | 积雨云</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">积雨云</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">微小透明，稍纵即逝<br>粗看无形，细听有声</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://rainzhop.github.io/2016/05/14/bittorrent-protocol-spec-learn-notes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王雨点">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/assets/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="积雨云">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">『笔记』BitTorrent协议学习
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-05-14 00:00:00" itemprop="dateCreated datePublished" datetime="2016-05-14T00:00:00+08:00">2016-05-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-17 14:31:44" itemprop="dateModified" datetime="2019-10-17T14:31:44+08:00">2019-10-17</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>心血来潮，想学习下BitTorrent协议，做个学习笔记~</p>
+<p>BitTorrent协议的维基百科释义：</p>
+<blockquote>
+<p><strong>BitTorrent协议</strong>（简称<strong>BT</strong>，俗称<strong>比特洪流</strong>、<strong>BT下载</strong>）是用在<a href="https://zh.wikipedia.org/wiki/%E5%AF%B9%E7%AD%89%E7%BD%91%E7%BB%9C" target="_blank" rel="noopener">对等网络</a>中<a href="https://zh.wikipedia.org/wiki/%E6%96%87%E4%BB%B6%E5%88%86%E4%BA%AB" target="_blank" rel="noopener">文件分享</a>的<a href="https://zh.wikipedia.org/wiki/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE" target="_blank" rel="noopener">网络协议</a><a href="https://zh.wikipedia.org/wiki/%E7%A8%8B%E5%BA%8F" target="_blank" rel="noopener">程序</a>。和<a href="https://zh.wikipedia.org/wiki/%E9%BB%9E%E5%B0%8D%E9%BB%9E" target="_blank" rel="noopener">点对点</a>（point-to-point）的协议<a href="https://zh.wikipedia.org/wiki/%E7%A8%8B%E5%BA%8F" target="_blank" rel="noopener">程序</a>不同，它是用户群对用户群（peer-to-peer），而且用户越多，下载同一文件的人越多，且下载后，继续维持上传的状态，就可以“分享”，成为其用户端节点下载的<a href="https://zh.wikipedia.org/wiki/%E7%A7%8D%E5%AD%90%E6%96%87%E4%BB%B6" target="_blank" rel="noopener">种子文件</a>（.torrent），下载该档案的速度越快。</p>
+</blockquote>
+<a id="more"></a>
+<blockquote>
+<p><strong>历史</strong></p>
+<p>该技术由美国的程序员<a href="https://zh.wikipedia.org/wiki/%E5%B8%83%E8%8E%B1%E5%A7%86%C2%B7%E7%A7%91%E4%BA%A8" target="_blank" rel="noopener">布莱姆·科亨</a>于2001年4月时发布，并于2001年7月2日时首次正式应用。</p>
+<p><strong>原理简述</strong></p>
+<p>普通的<a href="https://zh.wikipedia.org/wiki/HTTP" target="_blank" rel="noopener">HTTP</a>／<a href="https://zh.wikipedia.org/wiki/FTP" target="_blank" rel="noopener">FTP</a>下载使用<a href="https://zh.wikipedia.org/wiki/TCP/IP%E5%8D%94%E8%AD%B0" target="_blank" rel="noopener">TCP/IP协议</a>，BitTorrent协议是架构于TCP/IP协议之上的一个<a href="https://zh.wikipedia.org/wiki/P2P" target="_blank" rel="noopener">P2P</a>文件传输<a href="https://zh.wikipedia.org/wiki/%E5%8D%8F%E8%AE%AE" target="_blank" rel="noopener">协议</a>，处于TCP/IP结构的<a href="https://zh.wikipedia.org/wiki/%E5%BA%94%E7%94%A8%E5%B1%82" target="_blank" rel="noopener">应用层</a>。BitTorrent协议本身也包含了很多具体的内容协议和扩展协议，并在不断扩充中。</p>
+<p>根据BitTorrent协议，文件发布者会根据要发布的文件生成提供一个.torrent文件，即<a href="https://zh.wikipedia.org/wiki/%E7%A7%8D%E5%AD%90%E6%96%87%E4%BB%B6" target="_blank" rel="noopener">种子文件</a>，也简称为“种子”。</p>
+<p>种子文件本质上是<a href="https://zh.wikipedia.org/wiki/%E6%96%87%E6%9C%AC%E6%96%87%E4%BB%B6" target="_blank" rel="noopener">文本文件</a>，包含Tracker信息和文件信息两部分。Tracker信息主要是BT下载中需要用到的Tracker服务器的地址和针对Tracker服务器的设置，文件信息是根据对目标文件的计算生成的，计算结果根据BitTorrent协议内的<a href="https://zh.wikipedia.org/wiki/Bencode" target="_blank" rel="noopener">Bencode</a>规则进行编码。它的主要原理是需要把提供下载的文件虚拟分成大小相等的块，块大小必须为2k的整数次方（由于是虚拟分块，硬盘上并不产生各个块文件），并把每个块的索引信息和<a href="https://zh.wikipedia.org/wiki/Hash" target="_blank" rel="noopener">Hash</a>验证码写入种子文件中；所以，种子文件就是被下载文件的“索引”。</p>
+<p>下载者要下载文件内容，需要先得到相应的种子文件，然后使用BT客户端软件进行下载。</p>
+<p>下载时，BT客户端首先解析种子文件得到Tracker地址，然后连接Tracker服务器。Tracker服务器回应下载者的请求，提供下载者其他下载者（包括发布者）的IP。下载者再连接其他下载者，根据种子文件，两者分别告知对方自己已经有的块，然后交换对方所没有的数据。此时不需要其他服务器参与，分散了单个线路上的数据流量，因此减轻了服务器负担。</p>
+<p>下载者每得到一个块，需要算出下载块的Hash验证码与种子文件中的对比，如果一样则说明块正确，不一样则需要重新下载这个块。这种规定是为了解决下载内容准确性的问题。</p>
+<p>一般的HTTP/FTP下载，发布文件仅在某个或某几个服务器，下载的人太多，服务器的<a href="https://zh.wikipedia.org/wiki/%E5%B8%A6%E5%AE%BD" target="_blank" rel="noopener">带宽</a>很易不胜负荷，变得很慢。而BitTorrent协议下载的特点是，下载的人越多，提供的带宽也越多，下载速度就越快。同时，拥有完整文件的用户也会越来越多，使文件的“寿命”不断延长。</p>
+<p>为了解决某些用户“下完就跑”的现象，在非官方BitTorrent协议中还存在一种慢慢开放下载内容的<a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E7%B4%9A%E7%A8%AE%E5%AD%90" target="_blank" rel="noopener">超级种子</a>的<a href="https://zh.wikipedia.org/wiki/%E7%AE%97%E6%B3%95" target="_blank" rel="noopener">算法</a>。</p>
+</blockquote>
+<p>以下内容出自BEP03（<a href="http://www.bittorrent.org/beps/bep_0003.html" target="_blank" rel="noopener">The BitTorrent Protocol Specification</a>）</p>
+<h2 id="bencode编码"><a href="#bencode编码" class="headerlink" title="bencode编码"></a>bencode编码</h2><p>.torrent文件是经过bencode编码的文本文件。bencode编码规则如下：</p>
+<ul>
+<li>字符串：<code>&lt;字符串长度&gt;+冒号+&lt;字符串&gt;</code>，例：<code>&quot;abcd&quot;</code>编码为<code>4:abcd</code></li>
+<li>整数：<code>i+&lt;整数&gt;+e</code>，例：<code>13</code>编码为<code>i13e</code>，<code>-4</code>编码为<code>i-4e</code></li>
+<li>列表：<code>l+&lt;列表内容&gt;+e</code>，例：<code>[&quot;abcd&quot;, 13]</code>编码为<code>l4:abcdi13ee</code></li>
+<li>字典：<code>d+&lt;键值对&gt;+e</code>，例：<code>{&quot;dog&quot;: &quot;bark&quot;, 13: &#39;&quot;Judas&quot;}</code>编码为<code>d3:dog4:barki13e5:Judase</code></li>
+</ul>
+<h2 id="元信息文件"><a href="#元信息文件" class="headerlink" title="元信息文件"></a>元信息文件</h2><p>元信息文件（metainfo文件）就是.torrent文件，是经过bencode编码的字典。这个字典包含如下两个key：</p>
+<ul>
+<li><code>announce</code>：Tracker服务器URL</li>
+<li><code>info</code>：这个key又映射到另一个字典</li>
+</ul>
+<h3 id="info字典"><a href="#info字典" class="headerlink" title="info字典"></a>info字典</h3><p>info字典包含如下key：</p>
+<ul>
+<li><code>name</code>：映射到一个字符串，表示资源名字。资源文件仅有一个时，该字符串就是资源文件的名字，当资源文件有多个时，该字符串是文件夹的名字。</li>
+<li><code>pieces length</code>：映射到一个整数，表示每个文件块的大小。资源文件会被分割成多个固定大小的分块，除了最后一块可能因截断较小外，其他文件分块的大小事一样的。<code>piece length</code>几乎总是2的n次幂，通常为2<sup>18</sup>=256KB（）。</li>
+<li><code>pieces</code>：映射到一个字符串，该字符串长度为20的倍数。没20个字节表示一个piece的SHA1哈希值。</li>
+<li><code>length</code>或<code>files</code>：当出现<code>length</code>时则表示资源仅有一个文件，value为该文件大小。当出现<code>files</code>时则表示不仅一个文件，value为一个集合了资源文件的列表，列表中每个元素表示一个资源文件，形式是字典，该字典包含两个key：<ul>
+<li><code>length</code>：表示文件大小。</li>
+<li><code>path</code>：又是一个列表，其中元素是一个个字符串，表示了一层层文件夹名字，最后一项是资源文件名。</li>
+</ul>
+</li>
+</ul>
+<h2 id="向Tracker服务器查询peer信息"><a href="#向Tracker服务器查询peer信息" class="headerlink" title="向Tracker服务器查询peer信息"></a>向Tracker服务器查询peer信息</h2><p>向Tracker服务器发出的GET请求应包含如下key：</p>
+<ul>
+<li><code>info_hash</code>：20字节长的字符串，为.torrent文件中info字典部分的sha1哈希值，用来唯一标识种子文件进而标识资源。</li>
+<li><code>peer_id</code>：20个字节长的字符串，用来标识下载器。每个下载器在开启一个新的下载时都会随机生成它自己的id。</li>
+<li><code>ip</code>：可选。指示本peer所在IP。</li>
+<li><code>port</code>：指示本peer所监听的端口。默认从6881开始选择可用端口，若尝试到6889仍失败则放弃监听。</li>
+<li><code>uploaded</code>：上传量。</li>
+<li><code>downloaed</code>：下载量。</li>
+<li><code>left</code>：尚需下载量。</li>
+<li><code>event</code>：可选。通知本peer的下载状态，<code>stared</code>/<code>completed</code>/<code>stopped</code>/<code>empty</code>。</li>
+</ul>
+<p>Tracker服务器返回的响应是经过bencode编码的字典，若GET请求失败，则仅含key：</p>
+<ul>
+<li><code>failure reason</code>：映射到一个字符串，用自然语言说明为啥失败。</li>
+</ul>
+<p>若成功，则含key如下：</p>
+<ul>
+<li><code>interval</code>：value是个整数，告诉peer等多久再发起请求。但若是因事件触发的请求则不受此值约束。</li>
+<li><code>peers</code>：映射到一个元素为字典的列表。列表中的元素代表了一堆peer，每个peer有一个peer id，ip和port。这些是拥有所查询资源的peer。</li>
+</ul>
+<p>这是通过HTTP协议向Tracker进行查询的协议，此外还可以通过UDP进行查询，详见<a href="http://www.bittorrent.org/beps/bep_0015.html" target="_blank" rel="noopener">UDP Tracker Protocol for BitTorrent</a>。</p>
+<h2 id="peer协议"><a href="#peer协议" class="headerlink" title="peer协议"></a>peer协议</h2><p>BT的peer协议可工作在TCP或 <a href="http://www.bittorrent.org/beps/bep_0029.html" target="_blank" rel="noopener">uTP</a>上。</p>
+<p>peer连接是对称的。数据和消息传输都是双向的且采用相同形式。</p>
+<p>peer协议通过元信息文件中的信息索引文件分块，当peer下载完一个文件分块下载时会对该文件分块做哈希校验，并通知其他peer它已经完成该分块的下载。</p>
+<p>连接两端均有一个2bit的状态位，分别表示是否choked和是否有兴趣。choked表示在unchoking发生前不会有数据被发送。</p>
+<p>当一端有兴趣且另一端没有choke时，数据得以传输。兴趣位的维护必须时刻保持更新，只要下载器没有要请求的东西就应当表示没有兴趣，即使它本来就被choke了。</p>
+<p>peer协议从握手消息开始，后边跟着没完没了的消息流，消息的格式是<code>&lt;长度&gt;+&lt;字符串&gt;</code>。握手消息从内容为数字19+字符串”BitTorrent protocol”开始。这之后的所有整数都将被编码成4字节大端。</p>
+<p>在协议名称之后跟着8个保留字节。<a href="http://www.bittorrent.org/beps/bep_0010.html" target="_blank" rel="noopener">BEP 10</a>中提到了如何利用这些保留字节扩展协议。</p>
+<p>紧接着是20个字节，是元信息文件中info部分的SHA1哈希值，内容和发给Tracker服务器的GET请求中的info_hash一样。如果连接两端发送的这个值不一致，则应断开这个连接。</p>
+<p>上边那个哈希值之后是20字节的peer id，这个peer id就是在Tracker服务器查询到的peer id。如果收到这个id的peer的id不是这个id（拗口啊o(╯□╰)o），则连接应被断开。</p>
+<p>到此握手消息就完毕了，接着就是一串串消息流。0长度的消息用来keepalive，每两分钟一次。</p>
+<h2 id="peer协议消息"><a href="#peer协议消息" class="headerlink" title="peer协议消息"></a>peer协议消息</h2><p>本节介绍keepalive消息之外的peer消息。</p>
+<p>所有消息使用第一个字节标识消息类型，值和类型的对应关系如下：</p>
+<ul>
+<li>0 — choke</li>
+<li>1 — unchoke</li>
+<li>2 — interested</li>
+<li>3 — not interested</li>
+<li>4 — have</li>
+<li>5 — bitfield</li>
+<li>6 — request</li>
+<li>7 — piece</li>
+<li>8 — cancel</li>
+</ul>
+<p>其中前四个消息类型不带有消息载荷。</p>
+<p>bitfield消息用于告知对方自己对资源的拥有情况。</p>
+<p>have消息的载荷是一个数，用来告知对方自己刚刚完成下载的分块索引值。</p>
+<p>request消息包含index+begin+length。请求文件分块。</p>
+<p>cancel消息包含index+begin+length。</p>
+<p>piece消息包含index+begin+piece。piece消息与request消息存在关联。</p>
+<p>下载器通常乱序下载文件分块。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/笔记/" rel="tag"># 笔记</a>
+          
+            <a href="/tags/bt/" rel="tag"># bt</a>
+          
+            <a href="/tags/协议/" rel="tag"># 协议</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/02/01/wireshark-plugins-compile-notes/" rel="next" title="Wireshark插件编译记录">
+                <i class="fa fa-chevron-left"></i> Wireshark插件编译记录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/23/dht-protocol-learn-notes/" rel="prev" title="『笔记』DHT协议学习">
+                『笔记』DHT协议学习 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/avatar.jpg" alt="王雨点">
+            
+              <p class="site-author-name" itemprop="name">王雨点</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">12</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">17</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/rainzhop" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/cocozelle" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.douban.com/people/wangyudian" target="_blank" title="豆瓣"><i class="fa fa-fw fa-globe"></i>豆瓣</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/rainzhop" target="_blank" title="知乎"><i class="fa fa-fw fa-globe"></i>知乎</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#bencode编码"><span class="nav-text">bencode编码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#元信息文件"><span class="nav-text">元信息文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#info字典"><span class="nav-text">info字典</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#向Tracker服务器查询peer信息"><span class="nav-text">向Tracker服务器查询peer信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#peer协议"><span class="nav-text">peer协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#peer协议消息"><span class="nav-text">peer协议消息</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王雨点</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.3.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

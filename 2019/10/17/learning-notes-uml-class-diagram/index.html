@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css">
+
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="UML是一种模型语言，用于描述软件模型和结构。 最常用的UML图是UML类图（class diagram），主要用于描述系统的结构化设计，可以显示出类、接口以及它们之间的静态结构和关系。 因为在阅读技术类文章时偶尔会看到类图，在此整理一下相关概念。 类图的元素类图中包含以下模型元素：  类 接口 依赖关系 继承关系 关联关系 聚合关系 组合关系 实现关系">
+<meta name="keywords" content="笔记,uml,oop">
+<meta property="og:type" content="article">
+<meta property="og:title" content="『笔记』UML类图基础知识">
+<meta property="og:url" content="https://rainzhop.github.io/2019/10/17/learning-notes-uml-class-diagram/index.html">
+<meta property="og:site_name" content="积雨云">
+<meta property="og:description" content="UML是一种模型语言，用于描述软件模型和结构。 最常用的UML图是UML类图（class diagram），主要用于描述系统的结构化设计，可以显示出类、接口以及它们之间的静态结构和关系。 因为在阅读技术类文章时偶尔会看到类图，在此整理一下相关概念。 类图的元素类图中包含以下模型元素：  类 接口 依赖关系 继承关系 关联关系 聚合关系 组合关系 实现关系">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://rainzhop.github.io/assets/uml-class-diagram.png">
+<meta property="og:image" content="https://rainzhop.github.io/assets/uml-interface.png">
+<meta property="og:image" content="https://rainzhop.github.io/assets/uml-dependency.png">
+<meta property="og:image" content="https://rainzhop.github.io/assets/uml-inheritance.png">
+<meta property="og:image" content="https://rainzhop.github.io/assets/uml-association.png">
+<meta property="og:image" content="https://rainzhop.github.io/assets/uml-aggregation.png">
+<meta property="og:image" content="https://rainzhop.github.io/assets/uml-composition.png">
+<meta property="og:image" content="https://rainzhop.github.io/assets/uml-realization.png">
+<meta property="og:updated_time" content="2019-10-17T06:32:03.775Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="『笔记』UML类图基础知识">
+<meta name="twitter:description" content="UML是一种模型语言，用于描述软件模型和结构。 最常用的UML图是UML类图（class diagram），主要用于描述系统的结构化设计，可以显示出类、接口以及它们之间的静态结构和关系。 因为在阅读技术类文章时偶尔会看到类图，在此整理一下相关概念。 类图的元素类图中包含以下模型元素：  类 接口 依赖关系 继承关系 关联关系 聚合关系 组合关系 实现关系">
+<meta name="twitter:image" content="https://rainzhop.github.io/assets/uml-class-diagram.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://rainzhop.github.io/2019/10/17/learning-notes-uml-class-diagram/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>『笔记』UML类图基础知识 | 积雨云</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">积雨云</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">微小透明，稍纵即逝<br>粗看无形，细听有声</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://rainzhop.github.io/2019/10/17/learning-notes-uml-class-diagram/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王雨点">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/assets/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="积雨云">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">『笔记』UML类图基础知识
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-17 14:21:19 / 修改时间：14:32:03" itemprop="dateCreated datePublished" datetime="2019-10-17T14:21:19+08:00">2019-10-17</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>UML是一种模型语言，用于描述软件模型和结构。</p>
+<p>最常用的UML图是UML类图（class diagram），主要用于描述系统的结构化设计，可以显示出类、接口以及它们之间的静态结构和关系。</p>
+<p>因为在阅读技术类文章时偶尔会看到类图，在此整理一下相关概念。</p>
+<h2 id="类图的元素"><a href="#类图的元素" class="headerlink" title="类图的元素"></a>类图的元素</h2><p>类图中包含以下模型元素：</p>
+<ul>
+<li>类</li>
+<li>接口</li>
+<li>依赖关系</li>
+<li>继承关系</li>
+<li>关联关系</li>
+<li>聚合关系</li>
+<li>组合关系</li>
+<li>实现关系</li>
+</ul>
+<a id="more"></a>
+<h2 id="属性可见性符号"><a href="#属性可见性符号" class="headerlink" title="属性可见性符号"></a>属性可见性符号</h2><ul>
+<li><p><code>+</code>：public</p>
+</li>
+<li><p><code>-</code>：private</p>
+</li>
+<li><p><code>#</code>: protected</p>
+</li>
+</ul>
+<h2 id="表示方式"><a href="#表示方式" class="headerlink" title="表示方式"></a>表示方式</h2><p>接下来分别举例说明。</p>
+<h3 id="类（Class）"><a href="#类（Class）" class="headerlink" title="类（Class）"></a>类（Class）</h3><p><img src="/assets/uml-class-diagram.png" alt="class-diagram"></p>
+<h3 id="接口（Interface）"><a href="#接口（Interface）" class="headerlink" title="接口（Interface）"></a>接口（Interface）</h3><p><img src="/assets/uml-interface.png" alt="uml-interface"></p>
+<h3 id="依赖关系（Dependency）"><a href="#依赖关系（Dependency）" class="headerlink" title="依赖关系（Dependency）"></a>依赖关系（Dependency）</h3><p><img src="/assets/uml-dependency.png" alt="uml-dependency"></p>
+<h3 id="继承关系（Inheritance）"><a href="#继承关系（Inheritance）" class="headerlink" title="继承关系（Inheritance）"></a>继承关系（Inheritance）</h3><p><img src="/assets/uml-inheritance.png" alt="uml-inheritance"></p>
+<h3 id="关联关系（-Association-）"><a href="#关联关系（-Association-）" class="headerlink" title="关联关系（ Association ）"></a>关联关系（ Association ）</h3><p><img src="/assets/uml-association.png" alt="uml-association"></p>
+<h3 id="聚合关系（Aggregation）"><a href="#聚合关系（Aggregation）" class="headerlink" title="聚合关系（Aggregation）"></a>聚合关系（Aggregation）</h3><p><img src="/assets/uml-aggregation.png" alt="uml-aggregation"></p>
+<h3 id="组合关系（Composition）"><a href="#组合关系（Composition）" class="headerlink" title="组合关系（Composition）"></a>组合关系（Composition）</h3><p><img src="/assets/uml-composition.png" alt="uml-composition"></p>
+<h3 id="实现关系（Realization）"><a href="#实现关系（Realization）" class="headerlink" title="实现关系（Realization）"></a>实现关系（Realization）</h3><p><img src="/assets/uml-realization.png" alt="uml-realization"></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/笔记/" rel="tag"># 笔记</a>
+          
+            <a href="/tags/uml/" rel="tag"># uml</a>
+          
+            <a href="/tags/oop/" rel="tag"># oop</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/30/statistical-learning-notes/" rel="next" title="『笔记』统计学习方法">
+                <i class="fa fa-chevron-left"></i> 『笔记』统计学习方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/avatar.jpg" alt="王雨点">
+            
+              <p class="site-author-name" itemprop="name">王雨点</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">12</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">17</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/rainzhop" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/cocozelle" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.douban.com/people/wangyudian" target="_blank" title="豆瓣"><i class="fa fa-fw fa-globe"></i>豆瓣</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/rainzhop" target="_blank" title="知乎"><i class="fa fa-fw fa-globe"></i>知乎</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#类图的元素"><span class="nav-text">类图的元素</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#属性可见性符号"><span class="nav-text">属性可见性符号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#表示方式"><span class="nav-text">表示方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#类（Class）"><span class="nav-text">类（Class）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#接口（Interface）"><span class="nav-text">接口（Interface）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#依赖关系（Dependency）"><span class="nav-text">依赖关系（Dependency）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#继承关系（Inheritance）"><span class="nav-text">继承关系（Inheritance）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关联关系（-Association-）"><span class="nav-text">关联关系（ Association ）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#聚合关系（Aggregation）"><span class="nav-text">聚合关系（Aggregation）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#组合关系（Composition）"><span class="nav-text">组合关系（Composition）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现关系（Realization）"><span class="nav-text">实现关系（Realization）</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王雨点</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.3.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

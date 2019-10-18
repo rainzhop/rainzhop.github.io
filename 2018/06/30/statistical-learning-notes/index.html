@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css">
+
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前段时间帮成儿翻译的有关机器学习的论文被接受了，翻译过程中感觉相关知识还是有必要系统学习一下的，这就趁热学起来吧。我看的是李航的《统计学习方法》，相关知识点和自己的理解会在博客里进行一下记录。 1. 概论1.1 统计学习的特点 研究对象是数据 目的是对数据进行预测和分析 是概率论、统计学、信息论、计算理论、最优化理论、计算机科学的交叉学科  1.2 学习的定义Herbert A. Simon对学习">
+<meta name="keywords" content="机器学习,笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="『笔记』统计学习方法">
+<meta property="og:url" content="https://rainzhop.github.io/2018/06/30/statistical-learning-notes/index.html">
+<meta property="og:site_name" content="积雨云">
+<meta property="og:description" content="前段时间帮成儿翻译的有关机器学习的论文被接受了，翻译过程中感觉相关知识还是有必要系统学习一下的，这就趁热学起来吧。我看的是李航的《统计学习方法》，相关知识点和自己的理解会在博客里进行一下记录。 1. 概论1.1 统计学习的特点 研究对象是数据 目的是对数据进行预测和分析 是概率论、统计学、信息论、计算理论、最优化理论、计算机科学的交叉学科  1.2 学习的定义Herbert A. Simon对学习">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-17T06:32:17.741Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="『笔记』统计学习方法">
+<meta name="twitter:description" content="前段时间帮成儿翻译的有关机器学习的论文被接受了，翻译过程中感觉相关知识还是有必要系统学习一下的，这就趁热学起来吧。我看的是李航的《统计学习方法》，相关知识点和自己的理解会在博客里进行一下记录。 1. 概论1.1 统计学习的特点 研究对象是数据 目的是对数据进行预测和分析 是概率论、统计学、信息论、计算理论、最优化理论、计算机科学的交叉学科  1.2 学习的定义Herbert A. Simon对学习">
+
+
+
+
+
+
+  <link rel="canonical" href="https://rainzhop.github.io/2018/06/30/statistical-learning-notes/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>『笔记』统计学习方法 | 积雨云</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">积雨云</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">微小透明，稍纵即逝<br>粗看无形，细听有声</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://rainzhop.github.io/2018/06/30/statistical-learning-notes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王雨点">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/assets/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="积雨云">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">『笔记』统计学习方法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-30 21:30:40" itemprop="dateCreated datePublished" datetime="2018-06-30T21:30:40+08:00">2018-06-30</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-17 14:32:17" itemprop="dateModified" datetime="2019-10-17T14:32:17+08:00">2019-10-17</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前段时间帮成儿翻译的有关机器学习的论文被接受了，翻译过程中感觉相关知识还是有必要系统学习一下的，这就趁热学起来吧。我看的是李航的《统计学习方法》，相关知识点和自己的理解会在博客里进行一下记录。</p>
+<h2 id="1-概论"><a href="#1-概论" class="headerlink" title="1. 概论"></a>1. 概论</h2><h3 id="1-1-统计学习的特点"><a href="#1-1-统计学习的特点" class="headerlink" title="1.1 统计学习的特点"></a>1.1 统计学习的特点</h3><ul>
+<li>研究对象是<strong>数据</strong></li>
+<li>目的是对数据进行<strong>预测</strong>和<strong>分析</strong></li>
+<li>是概率论、统计学、信息论、计算理论、最优化理论、计算机科学的<strong>交叉学科</strong></li>
+</ul>
+<h3 id="1-2-学习的定义"><a href="#1-2-学习的定义" class="headerlink" title="1.2 学习的定义"></a>1.2 学习的定义</h3><p>Herbert A. Simon对<strong>学习</strong>给出以下定义</p>
+<blockquote>
+<p>如果一个系统能够通过执行某个过程改进它的性能，这就是学习</p>
+</blockquote>
+<h3 id="1-3-统计学习的对象"><a href="#1-3-统计学习的对象" class="headerlink" title="1.3 统计学习的对象"></a>1.3 统计学习的对象</h3><p>统计学习的对象是<strong>数据</strong>。<br>统计学习关于数据的基本假设是<strong>同类数据具有一定的统计规律性</strong>。</p>
+<a id="more"></a>
+<h3 id="1-4-统计学习在计算机科学中的定位"><a href="#1-4-统计学习在计算机科学中的定位" class="headerlink" title="1.4 统计学习在计算机科学中的定位"></a>1.4 统计学习在计算机科学中的定位</h3><p>计算机科学由三维组成：系统、计算、信息。<br>统计学习属于<strong>信息</strong>这一维。</p>
+<h3 id="1-5-统计学习的方法"><a href="#1-5-统计学习的方法" class="headerlink" title="1.5 统计学习的方法"></a>1.5 统计学习的方法</h3><ul>
+<li>监督学习</li>
+<li>非监督学习</li>
+<li>半监督学习</li>
+<li>强化学习</li>
+</ul>
+<h3 id="1-6-监督学习"><a href="#1-6-监督学习" class="headerlink" title="1.6 监督学习"></a>1.6 监督学习</h3><ul>
+<li>学习方法<ul>
+<li>训练数据集</li>
+<li>假设空间：要学习的模型所属于的<strong>某个函数的集合</strong></li>
+<li>评价准则</li>
+<li>测试数据</li>
+</ul>
+</li>
+<li>基本概念<ul>
+<li>输入空间：输入所有可能取值的集合</li>
+<li>输出空间：输出所有可能取值的集合</li>
+<li>通常输出空间远远小于输入空间</li>
+<li>特征向量：用于表示每个具体的输入即实例</li>
+<li>特征空间：所有特征向量存在的空间，特征空间每一维度对应一个特征</li>
+<li>模型都是定义在特征空间上的</li>
+</ul>
+</li>
+<li>解决问题类型<ul>
+<li>回归问题：输入变量与输出变量均为连续变量的预测问题</li>
+<li>分类问题：输出变量为有限个离散变量的预测问题</li>
+<li>标注问题：输入变量与输出变量均为变量序列的预测问题</li>
+</ul>
+</li>
+<li>基本假设：输入变量$X$和输出变量$Y$具有联合概率分布</li>
+</ul>
+<h3 id="1-7-统计学习三要素"><a href="#1-7-统计学习三要素" class="headerlink" title="1.7 统计学习三要素"></a>1.7 统计学习三要素</h3><script type="math/tex; mode=display">方法 = 模型 + 策略 + 算法</script><ul>
+<li>模型<ul>
+<li>模型的假设空间包括所有可能的<strong>条件概率分布</strong>或<strong>决策函数</strong></li>
+<li>假设空间通常是由一个参数向量决定的函数族，参数向量取值于<strong>参数空间</strong></li>
+</ul>
+</li>
+<li>策略<ul>
+<li>损失函数（代价函数）：度量模型一次预测的好坏</li>
+<li>风险函数（期望损失）：度量平均意义下模型预测的好坏</li>
+<li>经验风险（经验损失）：模型关于训练数据集的平均损失</li>
+<li>经验风险最小化：过拟合</li>
+<li>结构风险最小化：正则化</li>
+</ul>
+</li>
+<li>算法<ul>
+<li>解析解</li>
+<li>数值计算</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-8-模型选择"><a href="#1-8-模型选择" class="headerlink" title="1.8 模型选择"></a>1.8 模型选择</h3><ul>
+<li>训练误差 = 经验风险</li>
+<li>测试误差：反应了学习方法对未知测试数据集的预测能力</li>
+<li>目的：测试误差最小化</li>
+<li>正则化<ul>
+<li>结构风险最小化策略的实现</li>
+<li>正则化项一般是模型复杂度的单调递增函数，模型越复杂，正则化值就越大</li>
+<li>奥卡姆剃刀原理</li>
+</ul>
+</li>
+<li>交叉验证<ul>
+<li>将充足的样本分成三部分<ul>
+<li>训练集</li>
+<li>验证集</li>
+<li>测试集</li>
+</ul>
+</li>
+<li>简单交叉验证</li>
+<li>S折交叉验证</li>
+<li>留一交叉验证</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-9-泛化能力"><a href="#1-9-泛化能力" class="headerlink" title="1.9 泛化能力"></a>1.9 泛化能力</h3><ul>
+<li>模型对未知数据的预测能力</li>
+<li>泛化误差：期望风险</li>
+<li>泛化误差上界<ul>
+<li>当样本容量增加，泛化误差上界趋于0</li>
+<li>假设空间容量越大，模型就越难学，泛化误差上界就越大</li>
+</ul>
+</li>
+<li>泛化误差上界的证明<ul>
+<li>说明了泛化误差存在上界</li>
+<li>从而说明了统计学习的可行性，<strong>证明了机器是可以学习的</strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="1-10-监督学习方法"><a href="#1-10-监督学习方法" class="headerlink" title="1.10 监督学习方法"></a>1.10 监督学习方法</h3><ul>
+<li>生成方法<ul>
+<li>所学到的模型称为生成模型</li>
+<li>可以还原出输入和输出的<strong>联合概率分布</strong></li>
+</ul>
+</li>
+<li>判别方法<ul>
+<li>所学到的模型称为判别模型</li>
+<li>直接学习的是<strong>条件概率分布</strong>或<strong>决策函数</strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="1-11-分类问题"><a href="#1-11-分类问题" class="headerlink" title="1.11 分类问题"></a>1.11 分类问题</h3><ul>
+<li>输入变量<strong>可离散，可连续</strong></li>
+<li>输出变量为有限个<strong>离散</strong>变量</li>
+<li>分类器性能指标：分类准确率</li>
+<li>二类分类器性能指标：精确率、召回率</li>
+</ul>
+<h3 id="1-12-标注问题"><a href="#1-12-标注问题" class="headerlink" title="1.12 标注问题"></a>1.12 标注问题</h3><ul>
+<li>结构预测问题的简单形式</li>
+<li>输入是一个<strong>观测序列</strong></li>
+<li>输出是一个<strong>标记序列</strong>或<strong>状态序列</strong></li>
+<li>两个过程：<strong>学习</strong>、<strong>标注</strong></li>
+</ul>
+<h3 id="1-13-回归问题"><a href="#1-13-回归问题" class="headerlink" title="1.13 回归问题"></a>1.13 回归问题</h3><ul>
+<li>等价于函数拟合</li>
+<li>按照输入变量的个数可分为<ul>
+<li>一元回归</li>
+<li>多元回归</li>
+</ul>
+</li>
+<li>按照输入变量与输出变量的关系可分为<ul>
+<li>线性回归</li>
+<li>非线性回归</li>
+</ul>
+</li>
+<li>最常用的损失函数：平方损失函数</li>
+</ul>
+<h2 id="2-感知机"><a href="#2-感知机" class="headerlink" title="2 感知机"></a>2 感知机</h2><ul>
+<li><strong>二类</strong>分类的线性分类模型</li>
+<li>感知机是神经网络与SVM的基础</li>
+</ul>
+<h3 id="2-1-感知机模型"><a href="#2-1-感知机模型" class="headerlink" title="2.1 感知机模型"></a>2.1 感知机模型</h3><script type="math/tex; mode=display">f(x) = sign(w·x + b)</script><ul>
+<li>$w$叫做<strong>权值</strong>或<strong>权值向量</strong></li>
+<li>$b$叫做<strong>偏置</strong></li>
+<li>$sign(x) = \begin{cases}+1 &amp; x\geq0\\<br>-1 &amp; x &lt; 0\end{cases}$</li>
+<li>属于判别模型</li>
+</ul>
+<h3 id="2-2-感知机学习策略"><a href="#2-2-感知机学习策略" class="headerlink" title="2.2 感知机学习策略"></a>2.2 感知机学习策略</h3><ul>
+<li>目标是能求得一个能将训练集正实例点和负实例点完全正确分开的分离超平面</li>
+<li>学习策略：定义损失函数并将其极小化</li>
+<li>损失函数：误分类点到超平面的总距离</li>
+</ul>
+<h3 id="2-3-感知机学习算法"><a href="#2-3-感知机学习算法" class="headerlink" title="2.3 感知机学习算法"></a>2.3 感知机学习算法</h3><ul>
+<li>最优化方法是<strong>随机梯度下降法</strong></li>
+<li><strong>学习率</strong></li>
+<li>感知机学习算法由于采用不同的初值或选取不同的误分类点，解可以不同</li>
+<li>原始形式</li>
+<li>对偶形式：提高学习效率</li>
+</ul>
+<h2 id="3-k-近邻法"><a href="#3-k-近邻法" class="headerlink" title="3 $k$近邻法"></a>3 $k$近邻法</h2><h3 id="3-1-k-近邻算法"><a href="#3-1-k-近邻算法" class="headerlink" title="3.1 $k$近邻算法"></a>3.1 $k$近邻算法</h3><ul>
+<li>没有显式的学习过程</li>
+<li>利用训练数据集对特征向量空间进行划分</li>
+<li>基本要素<ul>
+<li>$k$值的选择</li>
+<li>距离度量</li>
+<li>分类决策规则</li>
+</ul>
+</li>
+<li>当$k=1$时，$k$近邻算法称为<strong>最近邻算法</strong></li>
+</ul>
+<h3 id="3-2-k-近邻模型"><a href="#3-2-k-近邻模型" class="headerlink" title="3.2 $k$近邻模型"></a>3.2 $k$近邻模型</h3><ul>
+<li>每个训练实例点拥有一个单元</li>
+<li>单元：特征空间中，对每个训练实例点，距离该点比其他点更近的所有点组成的一个区域</li>
+<li>距离度量<ul>
+<li>$L_p$距离<script type="math/tex; mode=display">L_p(x_i, x_j)=(\sum_{l=1}^n |x_i^{(l)} - x_j^{(l)}|^p)^{\frac{1}{p}}</script></li>
+<li>当$p=2$时，称为欧氏距离</li>
+<li>当$p=1$时，称为曼哈顿距离</li>
+<li>有不同距离度量所确定的最近邻点是不同的</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-3-k-值的选择"><a href="#3-3-k-值的选择" class="headerlink" title="3.3 $k$值的选择"></a>3.3 $k$值的选择</h3><ul>
+<li>近似误差：模型对训练集的误差</li>
+<li>估计误差：模型对测试集的误差</li>
+<li>$k$值的减小意味着整体模型变得复杂，容易发生过拟合</li>
+<li>$k$值的增大意味着整体的模型变得简单</li>
+</ul>
+<h3 id="3-4-分类决策规则"><a href="#3-4-分类决策规则" class="headerlink" title="3.4 分类决策规则"></a>3.4 分类决策规则</h3><ul>
+<li><strong>多数表决</strong></li>
+</ul>
+<h3 id="3-5-k-近邻算法的实现"><a href="#3-5-k-近邻算法的实现" class="headerlink" title="3.5 $k$近邻算法的实现"></a>3.5 $k$近邻算法的实现</h3><ul>
+<li>线性扫描</li>
+<li>kd树：提高$k$近邻搜索的效率</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+            <a href="/tags/笔记/" rel="tag"># 笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/15/deploy-flask-with-uwsgi-on-centos6-on-vps/" rel="next" title="在CentOS6.6上使用uWSGI部署Flask应用">
+                <i class="fa fa-chevron-left"></i> 在CentOS6.6上使用uWSGI部署Flask应用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/17/learning-notes-uml-class-diagram/" rel="prev" title="『笔记』UML类图基础知识">
+                『笔记』UML类图基础知识 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/avatar.jpg" alt="王雨点">
+            
+              <p class="site-author-name" itemprop="name">王雨点</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">12</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">17</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/rainzhop" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/cocozelle" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.douban.com/people/wangyudian" target="_blank" title="豆瓣"><i class="fa fa-fw fa-globe"></i>豆瓣</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/rainzhop" target="_blank" title="知乎"><i class="fa fa-fw fa-globe"></i>知乎</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-概论"><span class="nav-text">1. 概论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-统计学习的特点"><span class="nav-text">1.1 统计学习的特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-学习的定义"><span class="nav-text">1.2 学习的定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-统计学习的对象"><span class="nav-text">1.3 统计学习的对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-统计学习在计算机科学中的定位"><span class="nav-text">1.4 统计学习在计算机科学中的定位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-统计学习的方法"><span class="nav-text">1.5 统计学习的方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-监督学习"><span class="nav-text">1.6 监督学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-统计学习三要素"><span class="nav-text">1.7 统计学习三要素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-8-模型选择"><span class="nav-text">1.8 模型选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-9-泛化能力"><span class="nav-text">1.9 泛化能力</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-10-监督学习方法"><span class="nav-text">1.10 监督学习方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-11-分类问题"><span class="nav-text">1.11 分类问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-12-标注问题"><span class="nav-text">1.12 标注问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-13-回归问题"><span class="nav-text">1.13 回归问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-感知机"><span class="nav-text">2 感知机</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-感知机模型"><span class="nav-text">2.1 感知机模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-感知机学习策略"><span class="nav-text">2.2 感知机学习策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-感知机学习算法"><span class="nav-text">2.3 感知机学习算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-k-近邻法"><span class="nav-text">3 $k$近邻法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-k-近邻算法"><span class="nav-text">3.1 $k$近邻算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-k-近邻模型"><span class="nav-text">3.2 $k$近邻模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-k-值的选择"><span class="nav-text">3.3 $k$值的选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-分类决策规则"><span class="nav-text">3.4 分类决策规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-k-近邻算法的实现"><span class="nav-text">3.5 $k$近邻算法的实现</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王雨点</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.3.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      },
+      TeX: {equationNumbers: { autoNumber: "AMS" }}
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+    
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

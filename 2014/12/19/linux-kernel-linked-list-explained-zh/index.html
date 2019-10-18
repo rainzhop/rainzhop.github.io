@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css">
+
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文地址：Linux Kernel Linked List Explained作者：Kulesh Shanmugasundaram  简介C语言跟后来很多高级语言相比有一个最大的不同就是她没有内建一些好用的数据结构。不过，在Linux内核源码中有一个很好的循环链表的实现。 源码中的文件include/linux/list.h用C语言实现了一个非常好用的循环链表（后文中称linuxlist）。这个">
+<meta name="keywords" content="渣译,链表">
+<meta property="og:type" content="article">
+<meta property="og:title" content="『渣译』Linux内核链表的解释">
+<meta property="og:url" content="https://rainzhop.github.io/2014/12/19/linux-kernel-linked-list-explained-zh/index.html">
+<meta property="og:site_name" content="积雨云">
+<meta property="og:description" content="原文地址：Linux Kernel Linked List Explained作者：Kulesh Shanmugasundaram  简介C语言跟后来很多高级语言相比有一个最大的不同就是她没有内建一些好用的数据结构。不过，在Linux内核源码中有一个很好的循环链表的实现。 源码中的文件include/linux/list.h用C语言实现了一个非常好用的循环链表（后文中称linuxlist）。这个">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-17T06:32:09.143Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="『渣译』Linux内核链表的解释">
+<meta name="twitter:description" content="原文地址：Linux Kernel Linked List Explained作者：Kulesh Shanmugasundaram  简介C语言跟后来很多高级语言相比有一个最大的不同就是她没有内建一些好用的数据结构。不过，在Linux内核源码中有一个很好的循环链表的实现。 源码中的文件include/linux/list.h用C语言实现了一个非常好用的循环链表（后文中称linuxlist）。这个">
+
+
+
+
+
+
+  <link rel="canonical" href="https://rainzhop.github.io/2014/12/19/linux-kernel-linked-list-explained-zh/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>『渣译』Linux内核链表的解释 | 积雨云</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">积雨云</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">微小透明，稍纵即逝<br>粗看无形，细听有声</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://rainzhop.github.io/2014/12/19/linux-kernel-linked-list-explained-zh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王雨点">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/assets/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="积雨云">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">『渣译』Linux内核链表的解释
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2014-12-19 00:00:00" itemprop="dateCreated datePublished" datetime="2014-12-19T00:00:00+08:00">2014-12-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-17 14:32:09" itemprop="dateModified" datetime="2019-10-17T14:32:09+08:00">2019-10-17</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>原文地址：<a href="https://isis.poly.edu/kulesh/stuff/src/klist/" target="_blank" rel="noopener">Linux Kernel Linked List Explained</a><br>作者：Kulesh Shanmugasundaram</p>
+</blockquote>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>C语言跟后来很多高级语言相比有一个最大的不同就是她没有内建一些好用的数据结构。不过，在Linux内核源码中有一个很好的循环链表的实现。</p>
+<p>源码中的文件<code>include/linux/list.h</code>用C语言实现了一个非常好用的循环链表（后文中称<code>linuxlist</code>）。这个实现既高效又具有可移植性，这也是它被整合进内核的原因。当你在Linux内核中需要一个链表时就可以通过这个实现来将数据串起来，如果你想将它用在自己的应用程序中也几乎不需要对其进行什么修改就可以拿来用。</p>
+<p>linuxlist的源代码：<a href="/assets/list.h">list.h</a></p>
+<p>使用linuxlist的优点：</p>
+<ol>
+<li><strong>类型无关</strong><br>这个链表可以被用来组织你想到的任意数据结构。</li>
+<li><strong>可移植</strong><br>尽管我没有在所有平台上试过，但既然它都能被整合进内核，可移植性应该是没跑了。</li>
+<li><strong>易用</strong><br>由于这个链表时类型无关的，不管链表中存储的数据是什么都可以用相同的函数对链表进行初始化、读取和遍历。</li>
+<li><strong>易读</strong><br>宏和内联函数使得该文件中的代码优雅而易读。</li>
+<li><strong>省时</strong><br>让你不用重复造轮子。使用这个链表可以将你从大量的调试和针对不同类型数据反复地创造链表中解放出来。<a id="more"></a>
+</li>
+</ol>
+<p>linuxlist的实现与你曾见过的其他链表的实现可能都不同。通常，一个链表中会包含要被链接的元素，例如</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">my_list</span>&#123;</span></span><br><span class="line">	<span class="keyword">void</span> *myitem;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">my_list</span> *<span class="title">next</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">my_list</span> *<span class="title">prev</span>;</span></span><br><span class="line">	&#125;;</span><br></pre></td></tr></table></figure>
+<p>而linuxlist给人的感觉是链表包含在了要被链接的元素中。例如，如果要创建一个链接<code>struct my_cool_list</code>的链表，则需要编码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">my_cool_list</span>&#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span> <span class="comment">/* 内核链表结构体 */</span></span><br><span class="line">	<span class="keyword">int</span> my_cool_data;</span><br><span class="line">	<span class="keyword">void</span>* my_cool_void;</span><br><span class="line">	&#125;;</span><br></pre></td></tr></table></figure>
+<p>几点注意：</p>
+<ol>
+<li>linuxlist存在于要链接的元素中；</li>
+<li>你可以将<code>struct list_head</code>放在要链接的结构体中的任何地方；</li>
+<li>你可以随意为<code>struct list_head</code>变量命名；</li>
+<li>你可以设计复合链表。</li>
+</ol>
+<p>举个栗子，如下声明也是有效的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">todo_tasks</span>&#123;</span></span><br><span class="line">	<span class="keyword">char</span> *task_name;</span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">int</span> name_len;</span><br><span class="line">	<span class="keyword">short</span> <span class="keyword">int</span> status;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">int</span> sub_tasks;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">int</span> subtasks_completed;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">completed_subtasks</span>;</span><span class="comment">/* 链表结构体 */</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">int</span> subtasks_waiting;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">waiting_subtasks</span>;</span> 	<span class="comment">/* 另一个链表，所含元素可能相同也可能不同 */</span></span><br><span class="line"></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">todo_list</span>;</span>			<span class="comment">/* 另一个链表 */</span></span><br><span class="line">	&#125;;</span><br></pre></td></tr></table></figure>
+<p>OK，我们来看看linuxlist的结构在<code>include/linux/list.h</code>是如何定义的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>&#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> *<span class="title">next</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> *<span class="title">prev</span>;</span></span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来我们来关注点细节。我们首先看看在我们自己的程序中应该怎样使用这个数据结构，然后我们再来研究这个数据结构是如何工作的。</p>
+<hr>
+<h2 id="linuxlist的使用"><a href="#linuxlist的使用" class="headerlink" title="linuxlist的使用"></a>linuxlist的使用</h2><p>熟悉linuxlist相关函数的最好方法莫过于阅读<a href="!--￼10--&gt;/assets/list.h">list.h</a>文件，文件中的注释相当全面。</p>
+<p>下面的代码是创建、增加、删除以及遍历链表的栗子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"list.h"</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">kool_list</span>&#123;</span></span><br><span class="line">	<span class="keyword">int</span> to;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span></span><br><span class="line">	<span class="keyword">int</span> from;</span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span> </span>&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">kool_list</span> *<span class="title">tmp</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> *<span class="title">pos</span>, *<span class="title">q</span>;</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">int</span> i;</span><br><span class="line"></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">kool_list</span> <span class="title">mylist</span>;</span></span><br><span class="line">	INIT_LIST_HEAD(&amp;mylist.<span class="built_in">list</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 向mylist中添加元素 */</span></span><br><span class="line">	<span class="keyword">for</span>(i = <span class="number">5</span>; i != <span class="number">0</span>; --) &#123;</span><br><span class="line">		tmp = (struct kool_list *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(struct kool_list));</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* INIT_LIST_HEAD(&amp;tmp-&gt;list);</span></span><br><span class="line"><span class="comment">		 *</span></span><br><span class="line"><span class="comment">		 * 这条语句会初始化动态分配的list_head，</span></span><br><span class="line"><span class="comment">		 * 当紧接着运行的函数是add_list()或其他类似的函数时可以省略这条语句，</span></span><br><span class="line"><span class="comment">		 * 因为在这些函数中，动态分配的list_head中的prev和next会被初始化。</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line"></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"enter to and from:"</span>);</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">"%d %d"</span>, &amp;tmp-&gt;to, &amp;tmp-&gt;from);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* 将新元素'tmp'添加到mylist中 */</span></span><br><span class="line">		list_add(&amp;(tmp-&gt;<span class="built_in">list</span>), &amp;(mylist.<span class="built_in">list</span>));</span><br><span class="line">		<span class="comment">/* 也可以使用list_add_tail()函数将新元素添加到链表尾部</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"\n"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 现在你用有了一个struct kool_list类型的循环链表，</span></span><br><span class="line"><span class="comment">	 * 接下来我们来遍历这些元素并打印它们。</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* list_for_each()是一个for循环的宏，</span></span><br><span class="line"><span class="comment">	 * 第一个参数用来记录循环次数，换句话说它指向了每次循环中当前元素中的list_head变量。</span></span><br><span class="line"><span class="comment">	 * 第二个参数指向了整个链表的头，该参数在这个宏中不会改变。</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line"></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"traversing the list using list_for_each()\n"</span>);</span><br><span class="line">	list_for_each(pos, &amp;mylist.lis) &#123;</span><br><span class="line"></span><br><span class="line">		 <span class="comment">/* 此时： pos-&gt;next指向了下一个元素中的list变量，</span></span><br><span class="line"><span class="comment"> 		  * pos-&gt;prev则指向了前一个元素中的list变量。</span></span><br><span class="line"><span class="comment"> 		  * （这里所说的元素的类型是struct kool_list）</span></span><br><span class="line"><span class="comment">		  * 但我们要读取的不是list变量而是这个元素。</span></span><br><span class="line"><span class="comment">		  * 宏list_entry()就是用来读取元素的。</span></span><br><span class="line"><span class="comment">		  * 下一节"这是怎么做到的？"中解释了这是怎么做到的。</span></span><br><span class="line"><span class="comment">		  */</span></span><br><span class="line"></span><br><span class="line">		 tmp = list_entry(pos, struct kool_list, <span class="built_in">list</span>);</span><br><span class="line"></span><br><span class="line">		 <span class="comment">/* 给出一个指向struct list_head的指针、</span></span><br><span class="line"><span class="comment">		  * 它所在数据结构的类型以及它在这个数据结构中的名字（变量名），</span></span><br><span class="line"><span class="comment">		  * list_entry()会返回一个指向struct list_head指针所在的数据结构的指针。</span></span><br><span class="line"><span class="comment">		  * 例如，上边这次调用会返回一个指向struct kool_list的元素的指针。</span></span><br><span class="line"><span class="comment">		  */</span></span><br><span class="line"></span><br><span class="line">		 <span class="built_in">printf</span>(<span class="string">"to = %d from = %d\n"</span>, tmp-&gt;to, tmp-&gt;from);</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"\n"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 由于这是个循环链表，你也可以以逆序遍历链表。</span></span><br><span class="line"><span class="comment">	 * 你所需要做的只是将'list_for_each'替换为'list_for_each_prev'，</span></span><br><span class="line"><span class="comment">	 * 其他部分保持不变。</span></span><br><span class="line"><span class="comment">	 * 你也可以通过list_for_each_entry()来直接遍历链表中的元素，如下。</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line"></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"traversing the list using list_for_each_entry()\n"</span>);</span><br><span class="line">	list_for_each_entry(tmp, &amp;mylist.<span class="built_in">list</span>, <span class="built_in">list</span>)</span><br><span class="line">		 <span class="built_in">printf</span>(<span class="string">"to = %d from = %d\n"</span>, tmp-&gt;to, tmp-&gt;from);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"\n"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 现在我们来释放kool_list元素，由于我们会使用list_del()从链表中删除元素，</span></span><br><span class="line"><span class="comment">	 * 所以我们需要使用一个list_for_each()宏的更安全的版本list_for_each_safe()。</span></span><br><span class="line"><span class="comment">	 * 注意，在涉及到在循环中删除元素时你必须使用这个宏。</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line"></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"deleting the list using list_for_each_safe()\n"</span>);</span><br><span class="line">	list_for_each_safe(pos, q, &amp;mylist.lis) &#123;</span><br><span class="line">		 tmp= list_entry(pos, struct kool_list, <span class="built_in">list</span>);</span><br><span class="line">		 <span class="built_in">printf</span>(<span class="string">"freeing item to= %d from= %d\n"</span>, tmp-&gt;to, tmp-&gt;from);</span><br><span class="line">		 list_del(pos);</span><br><span class="line">		 <span class="built_in">free</span>(tmp);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="这是怎么做到的？"><a href="#这是怎么做到的？" class="headerlink" title="这是怎么做到的？"></a>这是怎么做到的？</h2><p>没错，大部分的实现都相当普通，但却十分精巧。精巧之处就在于我们能够通过一个指向<code>struct list_head</code>的指针来获取到这个<code>struct list_head</code>所在的数据结构的地址。正如上一节看到的，这个戏法是由<code>list_entry()</code>宏来完成的。现在我们就来看看这个宏究竟做了什么。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> list_entry(ptr, type, member) \</span></span><br><span class="line">	((type *)((<span class="keyword">char</span> *)(ptr) - (<span class="keyword">unsigned</span> <span class="keyword">long</span>)(&amp;((type *)<span class="number">0</span>)-&gt;member)))</span><br></pre></td></tr></table></figure>
+<p>对于上一节的栗子，这个宏展开后的结果是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">((struct kool_list *)((<span class="keyword">char</span> *)(pos) - (<span class="keyword">unsigned</span> <span class="keyword">long</span>)(&amp;((struct kool_list *)<span class="number">0</span>)-&gt;<span class="built_in">list</span>)))</span><br></pre></td></tr></table></figure>
+<p>这个问题困扰了不少人，但这确实是一个相当简单并且众所周知的小技巧。给定一个指向某个数据结构中的<code>struct list_head</code>的指针，宏<code>list_entry()</code>能够简单地算得指向这个数据结构的指针。为了达到这个目的，我们需要算出<code>list_head</code>在这个数据结构中的什么位置（相对于这个结构体起始位置的偏移量），然后将指向<code>list_head</code>的指针减去这个偏移量就可以得到这个数据结构的指针。</p>
+<p>现在问题就变为如何计算这个偏移量了。假设有一个数据结构<code>struct foo_bar</code>，你想找到这个结构体中<code>foo</code>成员所在的偏移量，那么你需要这么做：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">unsigned</span> <span class="keyword">long</span>)(&amp;((struct foo_bar *)<span class="number">0</span>)-&gt;boo)</span><br></pre></td></tr></table></figure>
+<p>即将内存地址0转换为一个指向某个结构体的地址（本栗子中是<code>struct foo_bar</code>）。然后取出你所感兴趣的成员的地址。这便是这个成员在结构体中的偏移量。而由于我们已经知道了这个成员的绝对地址，只需用该绝对地址减去这个偏移量，便可得到这个成员所在的结构体的起始地址。为了更好的理解这个问题，可以阅读一下如下代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">foobar</span>&#123;</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">int</span> foo;</span><br><span class="line">	<span class="keyword">char</span> bar;</span><br><span class="line">	<span class="keyword">char</span> boo;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">foobar</span> <span class="title">tmp</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"address of &amp;tmp is = %p\n\n"</span>, &amp;tmp);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"address of tmp-&gt;foo = %p \t offset of tmp-&gt;foo = %lu\n"</span>, \</span><br><span class="line">			&amp;tmp.foo, (<span class="keyword">unsigned</span> <span class="keyword">long</span>) &amp;((struct foobar *)<span class="number">0</span>)-&gt;foo);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"address of tmp-&gt;bar = %p \t offset of tmp-&gt;bar = %lu\n"</span>, \</span><br><span class="line">			&amp;tmp.bar, (<span class="keyword">unsigned</span> <span class="keyword">long</span>) &amp;((struct foobar *)<span class="number">0</span>)-&gt;bar);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"address of tmp-&gt;boo = %p \t offset of tmp-&gt;boo = %lu\n\n"</span>, \</span><br><span class="line">			&amp;tmp.boo, (<span class="keyword">unsigned</span> <span class="keyword">long</span>) &amp;((struct foobar *)<span class="number">0</span>)-&gt;boo);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"computed address of &amp;tmp using:\n"</span>);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"\taddress offset of tmp-&gt;foo: %p\n"</span>, \</span><br><span class="line">			(struct foobar *) (((<span class="keyword">char</span> *) &amp;tmp.foo) - \</span><br><span class="line">			((<span class="keyword">unsigned</span> <span class="keyword">long</span>) &amp;((struct foobar *)<span class="number">0</span>)-&gt;foo)));</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"\taddress and offset of tmp-&gt;bar: %p\n"</span>, \</span><br><span class="line">		      (struct foobar *) (((<span class="keyword">char</span> *) &amp;tmp.bar) - \</span><br><span class="line">		      ((<span class="keyword">unsigned</span> <span class="keyword">long</span>) &amp;((struct foobar *)<span class="number">0</span>)-&gt;bar)));</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"\taddress and offset of tmp-&gt;boo: %p\n"</span>, \</span><br><span class="line">		      (struct foobar *) (((<span class="keyword">char</span> *) &amp;tmp.boo) - \</span><br><span class="line">		      ((<span class="keyword">unsigned</span> <span class="keyword">long</span>) &amp;((struct foobar *)<span class="number">0</span>)-&gt;boo)));</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码输出的结果是：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">address of &amp;tmp is = 0xbfffed00</span><br><span class="line"></span><br><span class="line">address of tmp-&gt;foo = 0xbfffed00   offset of tmp-&gt;foo = 0</span><br><span class="line">address of tmp-&gt;bar = 0xbfffed04   offset of tmp-&gt;bar = 4</span><br><span class="line">address of tmp-&gt;boo = 0xbfffed05   offset of tmp-&gt;boo = 5</span><br><span class="line"></span><br><span class="line">computed<span class="built_in"> address </span>of &amp;tmp using:</span><br><span class="line"><span class="built_in">	address </span><span class="keyword">and</span> offset of tmp-&gt;foo: 0xbfffed00</span><br><span class="line"><span class="built_in">	address </span><span class="keyword">and</span> offset of tmp-&gt;bar: 0xbfffed00</span><br><span class="line"><span class="built_in">	address </span><span class="keyword">and</span> offset of tmp-&gt;boo: 0xbfffed00</span><br></pre></td></tr></table></figure>
+<p>（完）</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/渣译/" rel="tag"># 渣译</a>
+          
+            <a href="/tags/链表/" rel="tag"># 链表</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/08/09/learning-notes-git/" rel="next" title="『笔记』初学Git，记录一下常用命令">
+                <i class="fa fa-chevron-left"></i> 『笔记』初学Git，记录一下常用命令
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/02/01/wireshark-plugins-compile-notes/" rel="prev" title="Wireshark插件编译记录">
+                Wireshark插件编译记录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/avatar.jpg" alt="王雨点">
+            
+              <p class="site-author-name" itemprop="name">王雨点</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">12</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">17</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/rainzhop" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/cocozelle" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.douban.com/people/wangyudian" target="_blank" title="豆瓣"><i class="fa fa-fw fa-globe"></i>豆瓣</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/rainzhop" target="_blank" title="知乎"><i class="fa fa-fw fa-globe"></i>知乎</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linuxlist的使用"><span class="nav-text">linuxlist的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#这是怎么做到的？"><span class="nav-text">这是怎么做到的？</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王雨点</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.3.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

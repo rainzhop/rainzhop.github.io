@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css">
+
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="闯关地址在这里：CoolShell Puzzle 注意：这不是提示，而是直接给出了各关答案！   0 - Fuck your brainfirst.html 这一关使用到了奇葩语言brainfuck，谜面是一段用brainfuck写成的代码，自己写一个或网上找一个解释器对这段程序运行就能得到答案。">
+<meta name="keywords" content="游戏">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记录我在CoolShell Puzzle的闯关过程">
+<meta property="og:url" content="https://rainzhop.github.io/2014/08/04/record-my-solution-to-coolshell-puzzle/index.html">
+<meta property="og:site_name" content="积雨云">
+<meta property="og:description" content="闯关地址在这里：CoolShell Puzzle 注意：这不是提示，而是直接给出了各关答案！   0 - Fuck your brainfirst.html 这一关使用到了奇葩语言brainfuck，谜面是一段用brainfuck写成的代码，自己写一个或网上找一个解释器对这段程序运行就能得到答案。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-17T06:30:14.312Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="记录我在CoolShell Puzzle的闯关过程">
+<meta name="twitter:description" content="闯关地址在这里：CoolShell Puzzle 注意：这不是提示，而是直接给出了各关答案！   0 - Fuck your brainfirst.html 这一关使用到了奇葩语言brainfuck，谜面是一段用brainfuck写成的代码，自己写一个或网上找一个解释器对这段程序运行就能得到答案。">
+
+
+
+
+
+
+  <link rel="canonical" href="https://rainzhop.github.io/2014/08/04/record-my-solution-to-coolshell-puzzle/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>记录我在CoolShell Puzzle的闯关过程 | 积雨云</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">积雨云</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">微小透明，稍纵即逝<br>粗看无形，细听有声</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://rainzhop.github.io/2014/08/04/record-my-solution-to-coolshell-puzzle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王雨点">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/assets/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="积雨云">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">记录我在CoolShell Puzzle的闯关过程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2014-08-04 00:00:00" itemprop="dateCreated datePublished" datetime="2014-08-04T00:00:00+08:00">2014-08-04</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-17 14:30:14" itemprop="dateModified" datetime="2019-10-17T14:30:14+08:00">2019-10-17</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>闯关地址在这里：<a href="http://fun.coolshell.cn/" target="_blank" rel="noopener">CoolShell Puzzle</a></p>
+<p>注意：这不是提示，而是直接给出了各关答案！</p>
+</blockquote>
+<hr>
+<h4 id="0-Fuck-your-brain"><a href="#0-Fuck-your-brain" class="headerlink" title="0 - Fuck your brain"></a>0 - Fuck your brain</h4><p><code>first.html</code></p>
+<p>这一关使用到了奇葩语言<a href="https://zh.wikipedia.org/zh/Brainfuck" target="_blank" rel="noopener">brainfuck</a>，谜面是一段用brainfuck写成的代码，自己写一个或网上找一个解释器对这段程序运行就能得到答案。<br><a id="more"></a></p>
+<hr>
+<h4 id="1-Multiply"><a href="#1-Multiply" class="headerlink" title="1 - Multiply"></a>1 - Multiply</h4><p><code>welcome.html</code></p>
+<p>两个数的乘法，从谜面数列推算下一个数为<code>18 × 108 = 1944</code>，另一个数则是「生命、宇宙以及任何事情的终极答案」，答案非<code>42</code>莫属（<a href="https://zh.wikipedia.org/wiki/42" target="_blank" rel="noopener">原因</a>）。所以答案就是<code>1944 × 42 = 81648</code>。</p>
+<hr>
+<h4 id="2-Keyboard"><a href="#2-Keyboard" class="headerlink" title="2 - Keyboard"></a>2 - Keyboard</h4><p><code>81648.html</code></p>
+<p>谜面给出的是Dravok键盘布局和一句话，将这句话在QWERTY键盘上按照Dravok布局敲出来就会得到一段C代码：</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">main</span>() &#123;</span><br><span class="line">    <span class="selector-tag">printf</span>(&amp;unix[<span class="string">"\021%six\012\0"</span>],(unix)[<span class="string">"have"</span>]+<span class="string">"fun"</span>-<span class="number">0</span>x60);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在Linux系统中编译运行则得到答案。</p>
+<hr>
+<h4 id="3-QR-Code"><a href="#3-QR-Code" class="headerlink" title="3 - QR Code"></a>3 - QR Code</h4><p><code>unix.html</code></p>
+<p>一个二维码图片，扫来一看发现是字符的映射关系，按照这个关系翻译下边的乱码则得到：</p>
+<blockquote>
+<p>Where there is a shell, there is a way. I expect you use the shell command to solve this problem, now, please try using the rot13 of “shell” to enter next level.</p>
+</blockquote>
+<p>按照指示来做就能得到答案。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ rot13</span><br><span class="line"><span class="keyword">shell</span><span class="bash"></span></span><br></pre></td></tr></table></figure>
+<hr>
+<h4 id="4-cat"><a href="#4-cat" class="headerlink" title="4 - cat"></a>4 - cat</h4><p><code>furyy.html</code></p>
+<p>总结左侧回文的规律可以发现，都是五位的回文，且中间一位为小写字母，第一第二位分别是一个数字一个大写字母，最后组成单词的是回文的中间一位。按照这个规律查找网页源码注释里的字符则可以得出答案。</p>
+<hr>
+<h4 id="5-variables"><a href="#5-variables" class="headerlink" title="5 - variables"></a>5 - variables</h4><p><code>variables.html</code></p>
+<p>点击图片可以发现链接到了一个只有数字的页面。一步步追踪下去就会到达谜底页面。</p>
+<hr>
+<h4 id="6-tree"><a href="#6-tree" class="headerlink" title="6 - tree"></a>6 - tree</h4><p><code>tree.html</code></p>
+<p>通过中序遍历和后序遍历恢复出二叉树，求出最深路径即<code>zWp8LGn01wxJ7</code>，接着将下方的密码写入mess.txt后运行命令就可得到答案：</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ openssl enc -aes-<span class="number">128</span>-cbc -a -d -<span class="keyword">pass</span> <span class="keyword">pass</span>:zWp8LGn01wxJ7 -<span class="keyword">in</span> mess.txt</span><br></pre></td></tr></table></figure>
+<hr>
+<h4 id="7-N-Queens"><a href="#7-N-Queens" class="headerlink" title="7 - N Queens"></a>7 - N Queens</h4><p><code>nqueens.html</code></p>
+<p>首先算出九皇后问题所有的解，然后依照谜面上的公式穷举，可得当<code>$code = 953172864</code>时公式成立。</p>
+<hr>
+<h4 id="8-Excel-Column"><a href="#8-Excel-Column" class="headerlink" title="8 - Excel Column"></a>8 - Excel Column</h4><p><code>953172864.html</code></p>
+<p>26进制计算。</p>
+<hr>
+<h4 id="9-Fraternal-Organisation"><a href="#9-Fraternal-Organisation" class="headerlink" title="9 - Fraternal Organisation"></a>9 - Fraternal Organisation</h4><p><code>DUYO.html</code></p>
+<p>两张图片：猪圈（pigpen）、共济会（Freemason）。Google后找到<a href="https://zh.wikipedia.org/wiki/%E8%B1%AC%E5%9C%88%E5%AF%86%E7%A2%BC" target="_blank" rel="noopener">猪圈密码</a>。将谜面的符号解密后即得到答案。</p>
+<hr>
+<h4 id="Congratulations"><a href="#Congratulations" class="headerlink" title="Congratulations!"></a>Congratulations!</h4><p><code>helloworld.html</code></p>
+<hr>
+<p>最后，感谢<a href="http://weibo.com/haoel" target="_blank" rel="noopener">@左耳朵耗子</a>准备的游戏。</p>
+<p>（完）</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/游戏/" rel="tag"># 游戏</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/07/23/try-to-build-blog-with-github-and-jekyll/" rel="next" title="我也来试试Jekyll + GitHub Pages">
+                <i class="fa fa-chevron-left"></i> 我也来试试Jekyll + GitHub Pages
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/08/09/learning-notes-git/" rel="prev" title="『笔记』初学Git，记录一下常用命令">
+                『笔记』初学Git，记录一下常用命令 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/avatar.jpg" alt="王雨点">
+            
+              <p class="site-author-name" itemprop="name">王雨点</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">12</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">17</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/rainzhop" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/cocozelle" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.douban.com/people/wangyudian" target="_blank" title="豆瓣"><i class="fa fa-fw fa-globe"></i>豆瓣</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/rainzhop" target="_blank" title="知乎"><i class="fa fa-fw fa-globe"></i>知乎</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#0-Fuck-your-brain"><span class="nav-text">0 - Fuck your brain</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Multiply"><span class="nav-text">1 - Multiply</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Keyboard"><span class="nav-text">2 - Keyboard</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-QR-Code"><span class="nav-text">3 - QR Code</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-cat"><span class="nav-text">4 - cat</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-variables"><span class="nav-text">5 - variables</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-tree"><span class="nav-text">6 - tree</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-N-Queens"><span class="nav-text">7 - N Queens</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-Excel-Column"><span class="nav-text">8 - Excel Column</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-Fraternal-Organisation"><span class="nav-text">9 - Fraternal Organisation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Congratulations"><span class="nav-text">Congratulations!</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王雨点</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.3.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
